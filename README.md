@@ -1,372 +1,275 @@
-# **🚀 End-to-End CI/CD Pipeline for Node.js App Deployment on EKS using GitHub Actions**  
+# 🚀 CI/CD EKS Deployment Pipeline
 
-![eksbanner](https://imgur.com/h87KAuY.png)
-
----
-
-![CI/CD Pipeline](https://imgur.com/Ctznv2m.png)  
-
-## **📌 Table of Contents**  
-
-- [**🚀 End-to-End CI/CD Pipeline for Node.js App Deployment on EKS using GitHub Actions**](#-end-to-end-cicd-pipeline-for-nodejs-app-deployment-on-eks-using-github-actions)
-  - [**📌 Table of Contents**](#-table-of-contents)
-  - [**📂 Repository Structure**](#-repository-structure)
-  - [**🔧 Prerequisites**](#-prerequisites)
-  - [**⚙️ CI/CD Workflow**](#️-cicd-workflow)
-    - [**🔨 Build Job**](#-build-job)
-    - [**🚀 Deployment Job**](#-deployment-job)
-  - [**🏗️ Infrastructure Details**](#️-infrastructure-details)
-  - [**📦 Application Deployment Strategy**](#-application-deployment-strategy)
-  - [**🔄 GitOps Principles**](#-gitops-principles)
-  - [**🔒 Security Best Practices**](#-security-best-practices)
-  - [**📢 Notifications \& Alerts**](#-notifications--alerts)
-  - [**📊 Monitoring \& Logging**](#-monitoring--logging)
-  - [**📜 Contributing**](#-contributing)
-  - [**⭐ Support \& Author**](#-support--author)
-  - [**⭐ Hit the Star!**](#-hit-the-star)
-  - [🛠️ **Author \& Community**](#️-author--community)
-  - [📧 **Let's Connect!**](#-lets-connect)
-  - [📢 **Stay Updated!**](#-stay-updated)
+A complete DevOps project demonstrating Continuous Integration and Continuous Deployment (CI/CD) of containerized applications on Amazon EKS using GitHub Actions, Docker, Terraform, Kubernetes, and Amazon ECR.
 
 ---
 
-## **📂 Repository Structure**  
+## 📌 Overview
 
-The repository is structured for **modularity and maintainability**:
+This project automates the entire application deployment lifecycle using GitHub Actions workflows.
 
-```tree
-📂 root  
-├── 📂 .github/workflows/      # GitHub Actions CI/CD workflows
-│   ├── ci.yml                 # Pure CI pipeline (testing, linting, security)
-│   ├── cd-production.yml      # Production deployment pipeline
-│   └── deployment.yml         # Multi-environment deployment with versioning
+The pipeline performs:
+
+* Source Code Validation
+* Automated Testing
+* Docker Image Build
+* Docker Image Push to Amazon ECR
+* Infrastructure Provisioning using Terraform
+* Kubernetes Deployment using Kustomize
+* Continuous Deployment to Amazon EKS
+
+---
+
+## 🏗️ Architecture
+
+```text
+Developer
+    │
+    ▼
+GitHub Repository
+    │
+    ▼
+GitHub Actions
+    │
+    ▼
+Docker Build
+    │
+    ▼
+Amazon ECR
+    │
+    ▼
+Terraform
+    │
+    ▼
+Amazon EKS
+    │
+    ▼
+Kubernetes Deployment
+    │
+    ▼
+Application Access
+```
+
+---
+
+## 📂 Repository Structure
+
+```text
+CI-CD_EKS_deployment_pipeline
 │
-├── 📂 app                     # Application source code  
-│   ├── calculator.js          # Business logic for calculations  
-│   ├── calculator.test.js     # Unit tests for calculator functions  
-│   ├── Dockerfile             # Optimized Dockerfile for Node.js app  
-│   ├── index.js               # Main entry point of the Node.js application  
-│   └── package.json           # Project dependencies and scripts  
-│  
-├── 📂 kustomize               # Kubernetes manifests managed with Kustomize  
-│   ├── 📂 base                # Base configurations common for all environments  
-│   │   ├── deploy.yaml        # Enhanced deployment with health checks & security  
-│   │   ├── ingress.yaml       # Ingress configuration for routing traffic  
-│   │   ├── kustomization.yaml # Kustomize configuration with image management  
-│   │   └── svc.yaml           # Kubernetes Service definition  
-│   │  
-│   ├── 📂 overlays            # Environment-specific configurations  
-│   │   ├── 📂 dev             # Dev environment-specific Kustomize configs  
-│   │   ├── 📂 prod            # Production environment with enhanced security  
-│   │   └── 📂 staging         # Staging environment-specific configs  
-│  
-├── 📂 terraform               # Terraform configuration for infrastructure provisioning  
-│   ├── ingress-nginx.tf       # Terraform script for setting up NGINX Ingress  
-│   ├── main.tf                # Main Terraform file with EKS 1.29 & enhanced security  
-│   ├── outputs.tf             # Defines Terraform outputs  
-│   ├── terraform.tf           # Backend configuration with latest providers  
-│   └── variables.tf           # Input variables for Terraform modules  
-│  
-├── .eslintrc.js               # Enhanced ESLint with security plugins  
-├── .gitignore                 # Optimized gitignore with comprehensive coverage  
-├── docker-compose.yml         # Enhanced local development with Redis & SSL  
-├── nginx.conf                 # Production-ready Nginx with security headers  
-├── README.md                  # Project documentation and setup guide  
-└── VERSION                    # Tracks application versioning (Semantic Versioning)  
+├── workflows/
+│   ├── ci.yml
+│   ├── deployment.yml
+│   └── cd-production.yml
+│
+├── app.py
+├── index.js
+├── calculator.js
+├── calculator.test.js
+├── package.json
+├── requirements.txt
+│
+├── Dockerfile
+├── Dockerfile-python
+├── docker-compose.yml
+├── nginx.conf
+│
+├── deploy.yaml
+├── ingress.yaml
+├── svc.yaml
+├── kustomization.yaml
+│
+├── main.tf
+├── variables.tf
+├── outputs.tf
+├── terraform.tf
+├── ingress-nginx.tf
+│
+├── VERSION
+└── README.md
 ```
 
 ---
 
-## **🚀 Recent Improvements**  
+## ⚙️ Prerequisites
 
-This project has been comprehensively enhanced with modern best practices and security improvements:
+Install the following tools before deployment:
 
-### **🔄 GitHub Actions Workflows**
-- ✅ **Organized Workflow Structure** - Clear separation: CI, Production CD, Multi-Environment Deployment
-- ✅ **Pure CI Pipeline** - Testing, linting, security scanning (ci.yml)
-- ✅ **Production CD** - ECR integration, production deployment (cd-production.yml)
-- ✅ **Multi-Environment Deployment** - Version management, Terraform, DNS (deployment.yml)
-- ✅ **Latest Action Versions** - checkout@v4, setup-node@v4, codecov@v4
-- ✅ **Enhanced CI Pipeline** - Multi-node testing (18.x, 20.x) with fail-fast disabled
-- ✅ **Security Scanning** - Trivy vulnerability scanning with SARIF upload
-- ✅ **Master Branch Support** - Updated workflows to use master branch instead of main
+* AWS CLI
+* Docker
+* Kubernetes CLI (kubectl)
+* Terraform
+* Git
+* Node.js
+* Python
+* GitHub Actions
 
-### **🏗️ Terraform Infrastructure**
-- ✅ **EKS 1.29** - Latest stable version with enhanced add-ons
-- ✅ **Modern Providers** - AWS ~>5.50, Kubernetes ~>2.24, Helm ~>2.12
-- ✅ **Enhanced Security** - Encrypted GP3 volumes, private endpoints, CNI policies
-- ✅ **Better Tagging** - Comprehensive resource tagging strategy
-- ✅ **Version Constraints** - Terraform >=1.5.0 with provider version locking
+AWS Services:
 
-### **📦 Kustomize Configurations**
-- ✅ **Image Management** - Centralized image tagging and updates
-- ✅ **Enhanced Production** - 3 replicas, proper secret management, environment configs
-- ✅ **Better Structure** - Improved base configuration with replica management
-- ✅ **Secret Handling** - Environment-based secret generation
-
-### **🐳 Docker & Development**
-- ✅ **Redis Cache** - Added Redis service for improved performance
-- ✅ **SSL Support** - HTTPS termination with modern cipher suites
-- ✅ **Enhanced Nginx** - Security headers, rate limiting, gzip compression
-- ✅ **Health Checks** - Comprehensive health monitoring for all services
-- ✅ **Better Networking** - Dedicated bridge network and volume management
-
-### **🔧 Development Tools**
-- ✅ **Security ESLint** - Security plugins, import rules, promise handling
-- ✅ **Optimized Gitignore** - Clean, organized, comprehensive coverage
-- ✅ **Code Quality** - ES2022 standards, security-focused linting
-- ✅ **Modern Standards** - Latest Node.js 20 with proper caching
+* Amazon EKS
+* Amazon ECR
+* IAM
+* VPC
+* CloudWatch
 
 ---
 
-## **🔧 Prerequisites**  
+## 🔄 CI/CD Workflow
 
-Before you proceed, ensure you have the following installed:  
+### Continuous Integration
 
-- 🛠 **Node.js (>=20.x)**  
-- 🐳 **Docker & Docker Compose**  
-- 🏗️ **Terraform (>=1.5.0)**  
-- ☸ **kubectl (latest version)**  
-- 🎭 **Kustomize**  
-- ☁ **AWS CLI & eksctl**  
-- ⚙️ **GitHub Actions configured**  
-- 🔑 **AWS IAM permissions to manage EKS**  
-- 🔒 **Security scanning tools (Trivy, CodeQL)**  
+GitHub Actions performs:
 
----
+* Source Checkout
+* Dependency Installation
+* Unit Testing
+* Build Validation
 
-## **🏃‍♂️ Quick Start (Local Development)**  
+### Docker Build
 
-### **Option 1: Docker Compose (Recommended)**
 ```bash
-# Clone the repository
-git clone https://github.com/NotHarshhaa/CI-CD_EKS-GitHub_Actions.git
-cd CI-CD_EKS-GitHub_Actions
-
-# Start the application with Docker Compose
-docker-compose up --build
-
-# Access the application
-# Web UI: http://localhost:80
-# Health Check: http://localhost:80/health
-# API: POST http://localhost:80/api/calculate
+docker build -t application .
 ```
 
-### **Option 2: Local Node.js Development**
+### Push Image to ECR
+
 ```bash
-# Navigate to app directory
-cd app
+docker push <ecr-repository>
+```
 
-# Install dependencies
-npm install
+### Infrastructure Provisioning
 
-# Run in development mode
-npm run dev
+```bash
+terraform init
+terraform plan
+terraform apply
+```
 
-# Run tests
-npm test
+### Kubernetes Deployment
 
-# Run linting
-npm run lint
+```bash
+kubectl apply -k .
+```
+
+Resources Created:
+
+* Deployment
+* Service
+* Ingress
+
+---
+
+## ☁️ Infrastructure Components
+
+### Amazon EKS
+
+Managed Kubernetes cluster for application deployment.
+
+### Amazon ECR
+
+Stores container images.
+
+### Terraform
+
+Automates infrastructure provisioning.
+
+### IAM
+
+Controls access permissions.
+
+### CloudWatch
+
+Provides monitoring and logging capabilities.
+
+---
+
+## 📦 Deployment Environments
+
+### Development
+
+```bash
+kubectl apply -k dev
+```
+
+### Staging
+
+```bash
+kubectl apply -k staging
+```
+
+### Production
+
+```bash
+kubectl apply -k prod
 ```
 
 ---
 
-## **⚙️ CI/CD Workflow**  
+## 🔒 Security Features
 
-The **CI/CD pipeline** is organized into three specialized workflows using **GitHub Actions**:  
-
-### **� CI Pipeline (ci.yml)**  
-**Triggers**: Push/PR to master, develop, staging  
-
-1️⃣ **Code Quality Checks**  
-- Install **Node.js dependencies** using `npm ci`  
-- Run **linting** to ensure code quality standards  
-
-2️⃣ **Testing & Coverage**  
-- Execute **unit tests** across Node.js 18.x and 20.x  
-- Generate **coverage reports** with Codecov integration  
-
-3️⃣ **Security Scanning**  
-- Run **Trivy vulnerability scanner** on codebase  
-- Upload **SARIF results** to GitHub Security tab  
-
-### **🚀 Production CD Pipeline (cd-production.yml)**  
-**Triggers**: Push to master, tags, manual dispatch  
-
-1️⃣ **Build & Push**  
-- **Build Docker image** with production optimizations  
-- Push to **Amazon ECR** with SHA tagging  
-
-2️⃣ **Deploy to EKS**  
-- Update **Kubernetes manifests** using Kustomize  
-- Deploy to **production EKS cluster**  
-
-3️⃣ **Verification**  
-- **Health checks** and smoke tests  
-- **Security scanning** of deployed image  
-
-### **🌍 Multi-Environment Deployment (deployment.yml)**  
-**Triggers**: Push to prod/dev/staging, PR to dev  
-
-1️⃣ **Version Management**  
-- **Semantic versioning** based on commit messages  
-- Auto-tag and version file updates  
-
-2️⃣ **Infrastructure Provisioning**  
-- **Terraform** EKS cluster management  
-- Multi-environment infrastructure setup  
-
-3️⃣ **Application Deployment**  
-- **Docker builds** for each environment  
-- **Kustomize** deployments with environment-specific configs  
-- **DNS management** via Cloudflare  
-
-4️⃣ **Notifications**  
-- **Slack integration** for deployment status  
-- Comprehensive deployment reporting  
+* GitHub Secrets for credential management
+* IAM Role-Based Access Control
+* Secure Container Deployment
+* Infrastructure as Code
+* Kubernetes Resource Isolation
 
 ---
 
-### **🚀 Deployment Job**  
+## 📊 Monitoring
 
-1️⃣ **Terraform Setup**  
+Monitoring and logging are enabled through:
 
-- Initializes Terraform with `terraform init`.  
-- Ensures correct **state management**.  
-
-2️⃣ **Infrastructure Provisioning**  
-
-- Executes `terraform plan` and `terraform apply`.  
-- Deploys EKS clusters, networking, and storage.  
-
-3️⃣ **Kubernetes Configuration**  
-
-- Configures `kubectl` to interact with the cluster.  
-- Applies `Kustomize` overlays for environment-specific settings.  
-
-4️⃣ **Ingress Controller Setup**  
-
-- Uses **Helm** to install **NGINX Ingress**.  
-
-5️⃣ **Application Deployment**  
-
-- Deploys the latest **Docker image** to Kubernetes.  
-- Exposes the service via **Ingress and Load Balancer**.  
+* AWS CloudWatch
+* GitHub Actions Logs
+* Kubernetes Logs
 
 ---
 
-## **🏗️ Infrastructure Details**  
+## 🛠️ Technologies Used
 
-| Environment | Instance Type | Replica Count |
-|-------------|--------------|---------------|
-| **Dev**     | `t3.small`    | 1             |
-| **Staging** | `t3.medium`   | 3             |
-| **Prod**    | `t3.large`    | 3             |
-
-✅ **DNS Automation via Cloudflare**  
-
-- Environment-specific subdomains:  
-  - `dev.example.com`  
-  - `staging.example.com`  
-  - `prod.example.com`  
-
----
-
-## **📦 Application Deployment Strategy**  
-
-This project supports **multiple deployment strategies**:  
-
-✅ **Rolling Updates** – Default strategy, ensuring zero downtime.  
-✅ **Blue-Green Deployment** – Used in production environments.  
-✅ **Canary Deployments** – Gradual rollout for safe updates.  
+| Technology     | Purpose                 |
+| -------------- | ----------------------- |
+| AWS EKS        | Container Orchestration |
+| Amazon ECR     | Image Repository        |
+| Docker         | Containerization        |
+| Kubernetes     | Deployment Management   |
+| Terraform      | Infrastructure as Code  |
+| GitHub Actions | CI/CD Automation        |
+| Nginx          | Reverse Proxy           |
+| Node.js        | Application Runtime     |
+| Python         | Backend Services        |
 
 ---
 
-## **🔄 GitOps Principles**  
+## 🎯 Key Learning Areas
 
-✔ **Git as the Source of Truth**  
-✔ **Declarative Infrastructure** (Terraform & Kubernetes)  
-✔ **Automated Deployments via GitHub Actions**  
-
-Every infrastructure change must be made via a **Git commit**.  
-
----
-
-## **🔒 Security Best Practices**  
-
-🔐 **Secrets Management**  
-
-- Uses **AWS Secrets Manager** & GitHub Actions **encrypted secrets**.  
-
-🛡 **Container Security**  
-
-- Uses **Trivy** and **Docker Bench Security** for vulnerability scanning.  
-
-🚧 **IAM & Least Privilege**  
-
-- Uses **AWS IAM roles** with restricted access.  
+* DevOps Automation
+* CI/CD Pipeline Design
+* Kubernetes Administration
+* Docker Containerization
+* AWS Cloud Services
+* Infrastructure as Code
+* GitOps Practices
 
 ---
 
-## **📢 Notifications & Alerts**  
+## 👨‍💻 Author
 
-🔔 **Slack & Email Notifications**  
+**Libin Priyadarsan R**
 
-- **CI/CD Job Updates** – Pipeline status alerts.  
-- **DNS Updates** – Cloudflare integration for alerts.  
+DevOps & Cloud Enthusiast
 
-📡 **Monitoring & Logging**  
+Specializations:
 
-- **AWS CloudWatch** for logs & metrics.  
-- **Prometheus & Grafana** for observability.  
-
----
-
-## **📊 Monitoring & Logging**  
-
-✅ **Application Logs** – Aggregated using **Fluent Bit**.  
-✅ **Infrastructure Logs** – Stored in **AWS CloudWatch Logs**.  
-✅ **Metrics Monitoring** – Tracked using **Prometheus & Grafana**.  
+* AWS Cloud
+* Kubernetes
+* Docker
+* Terraform
+* GitHub Actions
+* CI/CD Automation
 
 ---
 
-## **📜 Contributing**  
+## ⭐ Project Status
 
-Want to contribute? Here’s how:  
-
-1. **Fork the repository** & create a new branch.  
-2. Make your changes and **commit with a descriptive message**.  
-3. Open a **Pull Request (PR)** for review.  
-
----
-
-## **⭐ Support & Author**  
-
-## **⭐ Hit the Star!**  
-
-If you find this repository helpful and plan to use it for learning, please consider giving it a star ⭐. Your support motivates me to keep improving and adding more valuable content! 🚀  
-
----
-
-## 🛠️ **Author & Community**  
-
-This project is crafted with passion by **[Harshhaa](https://github.com/NotHarshhaa)** 💡.  
-
-I’d love to hear your feedback! Feel free to open an issue, suggest improvements, or just drop by for a discussion. Let’s build a strong DevOps community together!  
-
----
-
-## 📧 **Let's Connect!**  
-
-Stay connected and explore more DevOps content with me:  
-
-[![LinkedIn](https://img.shields.io/badge/LinkedIn-%230077B5.svg?style=for-the-badge&logo=linkedin&logoColor=white)](https://linkedin.com/in/harshhaa-vardhan-reddy)  [![GitHub](https://img.shields.io/badge/GitHub-181717?style=for-the-badge&logo=github&logoColor=white)](https://github.com/NotHarshhaa)  [![Telegram](https://img.shields.io/badge/Telegram-26A5E4?style=for-the-badge&logo=telegram&logoColor=white)](https://t.me/prodevopsguy)  [![Dev.to](https://img.shields.io/badge/Dev.to-0A0A0A?style=for-the-badge&logo=dev.to&logoColor=white)](https://dev.to/notharshhaa)  [![Hashnode](https://img.shields.io/badge/Hashnode-2962FF?style=for-the-badge&logo=hashnode&logoColor=white)](https://hashnode.com/@prodevopsguy)  
-
----
-
-## 📢 **Stay Updated!**  
-
-Want to stay up to date with the latest DevOps trends, best practices, and project updates? Follow me on my blogs and social channels!  
-
-![Follow Me](https://imgur.com/2j7GSPs.png)
+Completed and maintained as a DevOps learning and deployment automation project.
